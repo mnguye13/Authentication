@@ -9,6 +9,7 @@ const User = require("../models/Users");
 const Controller = require("../controllers/controller");
 const UserController = new Controller(User);
 const router = express.Router();
+const passport = require("passport");
 // @route POST /register
 // @desc Register user
 // @access Public
@@ -79,7 +80,7 @@ router.post("/login", (req, res, next) => {
           (err, token) => {
             res.json({
               success: true,
-              token: "Bearer" + token
+              token: "Bearer " + token
             });
           }
         );
@@ -94,35 +95,45 @@ router.post("/login", (req, res, next) => {
 
 //------------------------------------------------------------------------------------------------------//
 
-router.get("/", (req, res, next) => {
-  UserController.getAll((error, result) => {
-    handleCallBack(error, result, res);
-  });
-});
+router.get(
+  "/",
+  passport.authenticate("jwt", { session: false }),
+  (req, res, next) => {
+    UserController.getAll((error, result) => {
+      handleCallBack(error, result, res);
+    });
+  }
+);
 
-router.post("/", (req, res, next) => {
-  UserController.create(req.body, (error, result) => {
-    handleCallBack(error, result, res);
-  });
-});
+router.get(
+  "/:id",
+  passport.authenticate("jwt", { session: false }),
+  (req, res, next) => {
+    UserController.find(req.params.id, (error, result) => {
+      handleCallBack(error, result, res);
+    });
+  }
+);
 
-router.get("/:id", (req, res, next) => {
-  UserController.find(req.params.id, (error, result) => {
-    handleCallBack(error, result, res);
-  });
-});
+router.patch(
+  "/:id",
+  passport.authenticate("jwt", { session: false }),
+  (req, res, next) => {
+    UserController.update(req.params.id, req.body, (error, result) => {
+      handleCallBack(error, result, res);
+    });
+  }
+);
 
-router.patch("/:id", (req, res, next) => {
-  UserController.update(req.params.id, req.body, (error, result) => {
-    handleCallBack(error, result, res);
-  });
-});
-
-router.delete("/:id", (req, res, next) => {
-  UserController.delete(req.params.id, (error, result) => {
-    handleCallBack(error, result, res);
-  });
-});
+router.delete(
+  "/:id",
+  passport.authenticate("jwt", { session: false }),
+  (req, res, next) => {
+    UserController.delete(req.params.id, (error, result) => {
+      handleCallBack(error, result, res);
+    });
+  }
+);
 
 let handleCallBack = (error, result, response) => {
   console.log("error: " + JSON.stringify(error));

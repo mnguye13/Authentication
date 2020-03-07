@@ -19,7 +19,7 @@ export default function Home() {
     console.log(userData.id);
     try {
       const data = await axios.get(
-        `http://localhost:3004/users/${userData.id}`
+        `http://172.29.179.176:3004/users/${userData.id}`
       );
       setUser(data.data.data);
     } catch (e) {
